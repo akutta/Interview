@@ -1,0 +1,650 @@
+//
+//  QuestionViewController.m
+//  LabelStudy
+//
+//  Created by Andrew Kutta on 6/4/12.
+//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//
+//
+//  If you dislike ugly code do not continue reading this.
+//
+
+#import "QuestionViewController.h"
+#import "AppDelegate.h"
+#import "ViewController.h"
+#import "CompletedViewController.h"
+#import <QuartzCore/QuartzCore.h>
+
+@interface QuestionViewController ()
+
+@end
+
+@implementation QuestionViewController
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil 
+            questions:(NSArray*)QuestionBank questionsToAsk:(NSMutableArray*)futureQuestions
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        highlightedButtons = [[NSMutableArray alloc] init];
+        // Custom initialization
+        questionBank = QuestionBank;
+        question = [[futureQuestions objectAtIndex:0] intValue];
+        [futureQuestions removeObjectAtIndex:0];
+        remainingQuestions = futureQuestions;
+        
+        //question = currentQuestion;
+        NSLog(@"Current Question:  %i",question);
+        imagesOnPile1 = [[NSMutableArray alloc] init];
+        imagesOnPile2 = [[NSMutableArray alloc] init];
+        imagesOnPile3 = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
+
+-(void)addBorder:(UILabel*)label width:(CGFloat)borderWidth radius:(CGFloat)cornerRadius {
+    label.layer.borderWidth = borderWidth;
+    label.layer.borderColor = [UIColor grayColor].CGColor;
+    label.layer.cornerRadius = cornerRadius;
+}
+
+- (void)changeHiddenPile1:(BOOL)isHidden {
+    pile1.hidden = isHidden;
+    pileLabel1.hidden = isHidden;
+    
+    // Pile 1 Sub Squares
+    pile1_1x1.hidden = isHidden;
+    pile1_1x2.hidden = isHidden;
+    pile1_1x3.hidden = isHidden;
+    pile1_2x1.hidden = isHidden;
+    pile1_2x2.hidden = isHidden;
+    pile1_2x3.hidden = isHidden;
+    pile1_3x1.hidden = isHidden;
+    pile1_3x2.hidden = isHidden;
+    pile1_3x3.hidden = isHidden;
+}
+
+- (void)changeHiddenPile2:(BOOL)isHidden {
+    pile2.hidden = isHidden;
+    pileLabel2.hidden = isHidden;
+    
+    // Pile 2 Sub Squares
+    pile2_1x1.hidden = isHidden;
+    pile2_1x2.hidden = isHidden;
+    pile2_1x3.hidden = isHidden;
+    pile2_2x1.hidden = isHidden;
+    pile2_2x2.hidden = isHidden;
+    pile2_2x3.hidden = isHidden;
+    pile2_3x1.hidden = isHidden;
+    pile2_3x2.hidden = isHidden;
+    pile2_3x3.hidden = isHidden;
+}
+
+- (void)changeHiddenPile3:(BOOL)isHidden {
+    pile3.hidden = isHidden;
+    pileLabel3.hidden = isHidden;
+    
+    // Pile 3 Sub Squares
+    pile3_1x1.hidden = isHidden;
+    pile3_1x2.hidden = isHidden;
+    pile3_1x3.hidden = isHidden;
+    pile3_2x1.hidden = isHidden;
+    pile3_2x2.hidden = isHidden;
+    pile3_2x3.hidden = isHidden;
+    pile3_3x1.hidden = isHidden;
+    pile3_3x2.hidden = isHidden;
+    pile3_3x3.hidden = isHidden;
+}
+
+
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    
+    [questionLabel setNumberOfLines:3];
+    [pileLabel1 setNumberOfLines:2];
+    [pileLabel2 setNumberOfLines:2];
+    [pileLabel3 setNumberOfLines:2];
+    
+    [self addBorder:mainTitle width:3.0f radius:0.0f];
+    [self addBorder:pile1 width:3.0f radius:0.0f];   
+    [self addBorder:pile2 width:3.0f radius:0.0f];
+    [self addBorder:pile3 width:3.0f radius:0.0f];
+    
+    // Pile 1 Sub Squares
+    [self addBorder:pile1_1x1 width:1.0f radius:0.0f];
+    [self addBorder:pile1_1x2 width:1.0f radius:0.0f];
+    [self addBorder:pile1_1x3 width:1.0f radius:0.0f];
+    [self addBorder:pile1_2x1 width:1.0f radius:0.0f];
+    [self addBorder:pile1_2x2 width:1.0f radius:0.0f];
+    [self addBorder:pile1_2x3 width:1.0f radius:0.0f];
+    [self addBorder:pile1_3x1 width:1.0f radius:0.0f];
+    [self addBorder:pile1_3x2 width:1.0f radius:0.0f];
+    [self addBorder:pile1_3x3 width:1.0f radius:0.0f];
+    
+    
+    // Pile 2 Sub Squares
+    [self addBorder:pile2_1x1 width:1.0f radius:0.0f];
+    [self addBorder:pile2_1x2 width:1.0f radius:0.0f];
+    [self addBorder:pile2_1x3 width:1.0f radius:0.0f];
+    [self addBorder:pile2_2x1 width:1.0f radius:0.0f];
+    [self addBorder:pile2_2x2 width:1.0f radius:0.0f];
+    [self addBorder:pile2_2x3 width:1.0f radius:0.0f];
+    [self addBorder:pile2_3x1 width:1.0f radius:0.0f];
+    [self addBorder:pile2_3x2 width:1.0f radius:0.0f];
+    [self addBorder:pile2_3x3 width:1.0f radius:0.0f];
+    
+    
+    // Pile 3 Sub Squares
+    [self addBorder:pile3_1x1 width:1.0f radius:0.0f];
+    [self addBorder:pile3_1x2 width:1.0f radius:0.0f];
+    [self addBorder:pile3_1x3 width:1.0f radius:0.0f];
+    [self addBorder:pile3_2x1 width:1.0f radius:0.0f];
+    [self addBorder:pile3_2x2 width:1.0f radius:0.0f];
+    [self addBorder:pile3_2x3 width:1.0f radius:0.0f];
+    [self addBorder:pile3_3x1 width:1.0f radius:0.0f];
+    [self addBorder:pile3_3x2 width:1.0f radius:0.0f];
+    [self addBorder:pile3_3x3 width:1.0f radius:0.0f];
+    
+    largeFrame = label0.frame;
+    CGFloat scale = 68.0f / MAX(label0.frame.size.width,label0.frame.size.height);
+    smallFrame = CGRectMake(0.0, 0.0, label0.frame.size.width * scale, label0.frame.size.height * scale);
+    
+
+    if ([self delegate].isNavajo) {
+        label8.hidden = true;
+        label4.hidden = true;
+    }
+    
+    
+    numPiles = 2;
+    
+    switch (question) {
+        case 1:
+            backButton.hidden = true;
+            questionLabel.text = @"If you and your friends were looking at these warning labels together, which ones do you think you would talk about the most? (You can choose up to three.)";
+            
+            [self changeHiddenPile1:TRUE];
+            [self changeHiddenPile3:TRUE];
+            break;
+        case 2:
+            backButton.hidden = true;
+            questionLabel.text = @"Would people like you make fun of any of these labels?  If yes, select which ones.";
+            
+            [self changeHiddenPile1:TRUE];
+            [self changeHiddenPile3:TRUE];
+            break;
+        case 3:
+            questionLabel.text = @"Please sort the warning labels into two piles, those meant for someone like you and those for a different kind of person.";
+            pileLabel1.text = @"Someone Like You";
+            pileLabel3.text = @"Different Kind of Person";
+            break;
+            
+        case 4:
+            questionLabel.text = @"Please sort the warning labels into three piles, those mostly for 'someone your age', for 'someone who is younger', and for 'someone who is older'.";
+            pileLabel1.text = @"Someone Who is Younger";
+            pileLabel2.text = @"Someone Your Age";
+            pileLabel3.text = @"Someone Who is Older";
+            numPiles = 3;
+            break;
+
+        case 5:
+            questionLabel.text = @"Please sort the warning labels into two piles, those that try to pressure or manipulate the viewer and those that do not.";
+            pileLabel1.text = @"Manipulate The Viewer";
+            pileLabel3.text = @"Do Not Manipulate";
+            break;
+            
+        case 6:
+            questionLabel.text = @"Please sort the warning labels into two piles, those that are offensive to you and those that are not.";
+            pileLabel1.text = @"Offensive";
+            pileLabel3.text = @"Not Offensive";
+            break;
+        
+        case 7:
+            questionLabel.text = @"Now pretend/imagine/consider that you were buying a pack of cigarettes and you could choose which label was on your pack.  Please sort the labels into two piles, those that you would try to avoid and those you would choose or accept.";
+            pileLabel1.text = @"Avoid Smoking";
+            pileLabel3.text = @"Not Avoid Smoking";
+            break;
+                    
+        default:
+            break;
+    }
+    
+    if ( question == [[questionBank lastObject] intValue] ) {
+        nextButton.hidden = true;
+        finishButton.hidden = false;
+    }
+     
+    if ( numPiles == 2 ) {
+        [self changeHiddenPile2:TRUE];
+    }
+    
+}
+
+- (void)viewDidUnload
+{
+    [super viewDidUnload];
+    // Release any retained subviews of the main view.
+    // e.g. self.myOutlet = nil;
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+	return YES;
+}
+
+-(IBAction)lastQuestion:(id)sender
+{
+    NSInteger index = [questionBank indexOfObject:[NSNumber numberWithInt:question]];
+    [remainingQuestions insertObject:[questionBank objectAtIndex:index] atIndex:0];
+    NSInteger numberToInsert = [[questionBank objectAtIndex:(index-1)] intValue];
+    [remainingQuestions insertObject:[NSNumber numberWithInt:numberToInsert] atIndex:0];
+    QuestionViewController *nextView = [[QuestionViewController alloc] initWithNibName:@"QuestionViewController" bundle:nil 
+                                                                             questions:questionBank questionsToAsk:remainingQuestions];
+    [[self delegate] switchView:self.view toView:nextView.view newController:nextView]; 
+}
+
+-(BOOL)processFeedback {
+    
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains
+    (NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    
+    NSString *fileName = [[NSString alloc] initWithFormat:@"%@_%i.txt", [self delegate].userId,question];
+    NSString *buffer = [[NSString alloc] initWithFormat:@"%@:\n", questionLabel.text];
+    
+    if ( question < 3 ) {
+        if ( question == 1 && [highlightedButtons count] > 3 ) {
+            UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"You have selected more than the maximum 3 labels for this question" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+            [alert show];
+            return NO;
+        } else {
+            if ( [highlightedButtons count] == 0 ) {
+                buffer = [buffer stringByAppendingString:@"\tNo Labels Selected\n"];
+            } else {
+                for ( UIButton* b in highlightedButtons ) {
+                    buffer = [buffer stringByAppendingFormat:@"\t%@:\n",b.titleLabel.text];
+                }
+                NSLog(@"Buffer:  %@",buffer);
+            }
+        }
+    } else {
+    
+        //NSLog(@"Question:\n\t%@",questionLabel.text);
+        //NSLog(@"\t%@:",pileLabel1.text);
+        buffer = [buffer stringByAppendingFormat:@"\t%@:\n",pileLabel1.text];
+        for (NSString* obj in imagesOnPile1) {
+            //NSLog(@"\t\t%@",obj);
+            buffer = [buffer stringByAppendingFormat:@"\t\t%@\n",obj];
+        }
+    
+        if (numPiles == 3 ) {
+            //NSLog(@"\t%@:",pileLabel2.text);
+            buffer = [buffer stringByAppendingFormat:@"\t%@:\n",pileLabel2.text];
+            for (NSString* obj in imagesOnPile2) {
+                //NSLog(@"\t\t%@",obj);
+                buffer = [buffer stringByAppendingFormat:@"\t\t%@\n",obj];
+            }
+        
+            //NSLog(@"\t%@:",pileLabel3.text);
+            buffer = [buffer stringByAppendingFormat:@"\t%@:\n",pileLabel3.text];
+            for (NSString* obj in imagesOnPile3) {
+                //NSLog(@"\t\t%@",obj);
+                buffer = [buffer stringByAppendingFormat:@"\t\t%@\n",obj];
+            }
+        } else {
+            //NSLog(@"\t%@:",pileLabel3.text);
+            buffer = [buffer stringByAppendingFormat:@"\t%@:\n",pileLabel3.text];
+            for (NSString* obj in imagesOnPile2) {
+                //NSLog(@"\t\t%@",obj);
+                buffer = [buffer stringByAppendingFormat:@"\t\t%@\n",obj];
+            }        
+        }
+    }
+        //NSLog(@"%@\n%@",[[NSString alloc] initWithFormat:@"%@/%@/%@",documentsDirectory,[self delegate].userId, fileName] ,buffer);
+    
+    [buffer writeToFile:[[NSString alloc] initWithFormat:@"%@/%@/%@",documentsDirectory,[self delegate].userId, fileName] 
+             atomically:YES 
+               encoding:NSStringEncodingConversionAllowLossy 
+                  error:nil];
+    
+    // Requires an Internet Connection
+    // Issue is that we can't expect to have an internet connection for the study that is being performed
+    // [[self delegate].dbInterface uploadFile:fileName dir:documentsDirectory userID:[self delegate].userId];
+    return YES;
+}
+
+-(IBAction)nextQuestion:(id)sender
+{
+    if ( [self processFeedback] == NO ) 
+        return;
+    QuestionViewController *nextView = [[QuestionViewController alloc] initWithNibName:@"QuestionViewController" bundle:nil 
+                                        questions:questionBank questionsToAsk:remainingQuestions];
+    [[self delegate] switchView:self.view toView:nextView.view newController:nextView]; 
+}
+
+-(IBAction)finishQuiz:(id)sender
+{
+    [self processFeedback];
+    
+    /*
+    ViewController *nextView = [[ViewController alloc] initWithNibName:@"ViewController" bundle:nil];
+    [[self delegate] switchView:self.view toView:nextView.view newController:nextView];
+    UIAlertView *balaji = [[UIAlertView alloc] initWithTitle:@"Alert" message:@"You have completed the survey. Thank you for participating." delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@"DONE", nil];
+    [balaji show];
+    */
+    
+    CompletedViewController *nextView = [[CompletedViewController alloc] initWithNibName:@"CompletedViewController" bundle:nil];
+    [[self delegate] switchView:self.view toView:nextView.view newController:nextView];
+    
+}
+
+-(AppDelegate*)delegate {
+    static AppDelegate* del;
+    if ( del == nil ) {
+        del = [[UIApplication sharedApplication] delegate];
+    }
+    
+    return del;
+}
+
+- (BOOL) withinRange:(CGFloat)point minValue:(CGFloat)min maxValue:(CGFloat)max {
+    if ( point > min )
+        if ( point < max ) 
+            return TRUE;
+    return FALSE;
+}
+
+- (BOOL) withinPile:(CGRect)bounds objectPoint:(CGPoint)point {
+    if ( [self withinRange:point.x minValue:bounds.origin.x maxValue:(bounds.origin.x+bounds.size.width)] )
+        if ( [self withinRange:point.y minValue:bounds.origin.y maxValue:(bounds.origin.y+bounds.size.height)] ) 
+            return TRUE;
+    
+    return FALSE;
+}
+
+-(void)removeFromPile:(NSMutableArray*)pile string:(NSString*)key {
+    if ( [pile containsObject:key] ) {
+        [pile removeObjectIdenticalTo:key];
+    }
+}
+
+
+-(BOOL)highlight:(UILabel*)pile objectPoint:(CGPoint)point highlightColor:(UIColor*)color {
+    if ( [self withinPile:pile.frame objectPoint:point] == TRUE ) {
+        pile.backgroundColor = color;
+        return TRUE;
+    } else {
+        pile.backgroundColor = nil;
+        return FALSE;
+    }
+}
+
+-(CGPoint)getCenter:(CGRect)frame {
+    return CGPointMake(frame.origin.x + frame.size.width/2, 
+                        frame.origin.y + frame.size.height/2);
+}
+
+-(CGPoint)checkHighlight:(CGPoint)point {
+    CGPoint retValue = CGPointZero;
+    if ( [self highlight:pile1_1x1 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile1_1x1.frame];
+    }
+    if ([self highlight:pile1_1x2 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile1_1x2.frame];
+    }
+    if ([self highlight:pile1_1x3 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile1_1x3.frame];
+    }
+    if ([self highlight:pile1_2x1 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile1_2x1.frame];
+    }
+    if ([self highlight:pile1_2x2 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile1_2x2.frame];
+    }
+    if ([self highlight:pile1_2x3 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile1_2x3.frame];
+    }
+    if ([self highlight:pile1_3x1 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile1_3x1.frame];
+    }
+    if ([self highlight:pile1_3x2 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile1_3x2.frame];
+    }
+    if ([self highlight:pile1_3x3 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile1_3x3.frame];
+    }
+    
+    if ([self highlight:pile2_1x1 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile2_1x1.frame];
+    }
+    if ([self highlight:pile2_1x2 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile2_1x2.frame];
+    }
+    if ([self highlight:pile2_1x3 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile2_1x3.frame];
+    }
+    if ([self highlight:pile2_2x1 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile2_2x1.frame];
+    }
+    if ([self highlight:pile2_2x2 objectPoint:point highlightColor:[UIColor blueColor]] ) {
+        retValue = [self getCenter:pile2_2x2.frame];
+    }
+    if ([self highlight:pile2_2x3 objectPoint:point highlightColor:[UIColor blueColor]] ){
+        retValue = [self getCenter:pile2_2x3.frame];
+    }
+    if ([self highlight:pile2_3x1 objectPoint:point highlightColor:[UIColor blueColor]] ){
+        retValue = [self getCenter:pile2_3x1.frame];
+    }
+    if ([self highlight:pile2_3x2 objectPoint:point highlightColor:[UIColor blueColor]] ){
+        retValue = [self getCenter:pile2_3x2.frame];
+    }
+    if ([self highlight:pile2_3x3 objectPoint:point highlightColor:[UIColor blueColor]] ){
+        retValue = [self getCenter:pile2_3x3.frame];
+    }
+
+    
+    if ([self highlight:pile3_1x1 objectPoint:point highlightColor:[UIColor blueColor]]) {
+        retValue = [self getCenter:pile3_1x1.frame];
+    }
+    if ([self highlight:pile3_1x2 objectPoint:point highlightColor:[UIColor blueColor]] ){
+        retValue = [self getCenter:pile3_1x2.frame];
+    }
+    if ([self highlight:pile3_1x3 objectPoint:point highlightColor:[UIColor blueColor]]) {
+        retValue = [self getCenter:pile3_1x3.frame];
+    }
+    if ([self highlight:pile3_2x1 objectPoint:point highlightColor:[UIColor blueColor]] ){
+        retValue = [self getCenter:pile3_2x1.frame];
+    }
+    if ([self highlight:pile3_2x2 objectPoint:point highlightColor:[UIColor blueColor]] ){
+        retValue = [self getCenter:pile3_2x2.frame];
+    }
+    if ([self highlight:pile3_2x3 objectPoint:point highlightColor:[UIColor blueColor]] ){
+        retValue = [self getCenter:pile3_2x3.frame];
+    }
+    if ([self highlight:pile3_3x1 objectPoint:point highlightColor:[UIColor blueColor]]) {
+        retValue = [self getCenter:pile3_3x1.frame];
+    }
+    if ([self highlight:pile3_3x2 objectPoint:point highlightColor:[UIColor blueColor]]) {
+        retValue = [self getCenter:pile3_3x2.frame];
+    }
+    if ([self highlight:pile3_3x3 objectPoint:point highlightColor:[UIColor blueColor]]) {
+        retValue = [self getCenter:pile3_3x3.frame];
+    }
+    
+    return retValue;
+}
+
+
+- (IBAction)imageReleased:(id)sender withEvent:(UIEvent*) event{
+    
+    if ( question < 3 ) {
+        [self performSelector:@selector(doHighlight:) withObject:sender afterDelay:0];
+        return;
+    }
+    
+    [self.view bringSubviewToFront:(UIView*)sender];
+    CGPoint point = [[[event allTouches] anyObject] locationInView:self.view];
+    UIControl *control = sender;
+    
+    NSUInteger pileNumber = 0;
+    
+    if ( [self withinPile:pile1.frame objectPoint:point] == TRUE ) {
+        //NSLog(@"Released Within Pile 1!");
+        pileNumber = 1;
+        //control.center = CGPointMake(pile1.frame.origin.x + pile1.frame.size.width/2, 
+                                    // pile1.frame.origin.y + pile1.frame.size.height/2);
+    }
+    
+    // Special Case if 3 piles
+    if (numPiles == 3 ) {
+        if ( [self withinPile:pile2.frame objectPoint:point] == TRUE ) {
+            //NSLog(@"Released Within Pile 2!");
+            //control.center = CGPointMake(pile2.frame.origin.x + pile2.frame.size.width/2, 
+                   //                      pile2.frame.origin.y + pile2.frame.size.height/2);
+            pileNumber = 2;
+        }
+        
+        if ( [self withinPile:pile3.frame objectPoint:point] == TRUE ) {
+            //NSLog(@"Released Within Pile 3!");
+            //control.center = CGPointMake(pile3.frame.origin.x + pile3.frame.size.width/2, 
+                 //                        pile3.frame.origin.y + pile3.frame.size.height/2);
+            pileNumber = 3;
+        }
+    } else {
+        if ( [self withinPile:pile3.frame objectPoint:point] == TRUE ) {
+            //NSLog(@"Released Within Pile 2!");
+            //control.center = CGPointMake(pile3.frame.origin.x + pile3.frame.size.width/2, 
+               //                          pile3.frame.origin.y + pile3.frame.size.height/2);
+            pileNumber = 2;
+        }
+    }
+    
+    NSString* labelText = ((UIButton*)sender).titleLabel.text;
+    
+    switch (pileNumber) {
+        case 0:
+            [self removeFromPile:imagesOnPile1 string:labelText];
+            [self removeFromPile:imagesOnPile2 string:labelText];
+            [self removeFromPile:imagesOnPile3 string:labelText];
+            break;
+        case 1:
+            [self removeFromPile:imagesOnPile2 string:labelText];
+            [self removeFromPile:imagesOnPile3 string:labelText];
+            [imagesOnPile1 addObject:labelText];
+            break;
+        case 2:
+            [self removeFromPile:imagesOnPile1 string:labelText];
+            [self removeFromPile:imagesOnPile3 string:labelText];
+            [imagesOnPile2 addObject:labelText];
+            break;
+        case 3:
+            [self removeFromPile:imagesOnPile1 string:labelText];
+            [self removeFromPile:imagesOnPile2 string:labelText];
+            [imagesOnPile3 addObject:labelText];
+            break;
+    }
+    
+    // Ugly ignore this too
+    CGPoint retVal = [self checkHighlight:point];
+    [self checkHighlight:(CGPointZero)];
+    if ( retVal.x != CGPointZero.x && retVal.y != CGPointZero.y ) {
+        // Subview is highlights.  Snap to that point
+        control.center = retVal;
+    }
+    pile1.backgroundColor = nil;
+    pile2.backgroundColor = nil;
+    pile3.backgroundColor = nil;
+}
+
+- (void)doHighlight:(UIButton*)b {
+    if ( [highlightedButtons containsObject:b] ) {
+        [highlightedButtons removeObject:b];
+        [b setHighlighted:NO];
+    } else {
+        [highlightedButtons addObject:b];
+        [b setHighlighted:YES];
+    }
+
+}
+
+- (IBAction) imageMoved:(id) sender withEvent:(UIEvent *) event
+{
+    
+    // Special Case of only Selecting an Image
+    if ( question < 3 ) {
+        
+//        NSArray *paths = NSSearchPathForDirectoriesInDomains
+//        (NSDocumentDirectory, NSUserDomainMask, YES);
+//        NSString *documentsDirectory = [paths objectAtIndex:0];
+//        
+//        NSString *fileName = [[NSString alloc] initWithFormat:@"%@_%i.txt", [self delegate].userId,question];
+//        //NSString *selectedLabel = [[NSString alloc] initWithFormat:@"%@",questionLabel.text];
+//        //selectedLabel = [selectedLabel stringByAppendingFormat:@"\n\t%@",((UIButton*)sender).titleLabel.text];
+//        NSString* selectedLabel = ((UIButton*)sender).titleLabel.text;
+//        
+//        [selectedLabel writeToFile:[[NSString alloc] initWithFormat:@"%@/%@/%@",documentsDirectory,[self delegate].userId, fileName] 
+//                 atomically:YES 
+//                   encoding:NSStringEncodingConversionAllowLossy 
+//                      error:nil];
+//
+//        
+//        [selectedLabel writeToFile:[[NSString alloc] initWithFormat:@"%@/%@/%@",documentsDirectory,[self delegate].userId, fileName] 
+//                 atomically:YES 
+//                   encoding:NSStringEncodingConversionAllowLossy 
+//                      error:nil];
+//        
+//        NSLog(@"Filename:  %@\n%@",fileName,selectedLabel);
+//        
+//        QuestionViewController *nextView = [[QuestionViewController alloc] initWithNibName:@"QuestionViewController" bundle:nil 
+//                                                                                 questions:questionBank questionsToAsk:remainingQuestions];
+//        [[self delegate] switchView:self.view toView:nextView.view newController:nextView]; 
+        return;
+    }
+    
+    [self.view bringSubviewToFront:(UIView*)sender];
+    CGPoint point = [[[event allTouches] anyObject] locationInView:self.view];
+    UIControl *control = sender;
+    control.center = point;
+    BOOL bInPile = false;
+    
+    if ( [self highlight:pile1 objectPoint:point highlightColor:[UIColor darkGrayColor]] ) {
+        bInPile = true;
+    }
+    
+    // Special Case if 3 piles
+    if (numPiles == 3 ) {
+        if ( [self highlight:pile2 objectPoint:point highlightColor:[UIColor darkGrayColor]] ) {
+            bInPile = true;
+        }
+        if ( [self highlight:pile3 objectPoint:point highlightColor:[UIColor darkGrayColor]] ) {
+            bInPile = true;
+        }
+    } else {
+        if ( [self highlight:pile3 objectPoint:point highlightColor:[UIColor darkGrayColor]] ) {
+            bInPile = true;
+        }
+    }
+    
+    [self checkHighlight:point];
+    
+    if (bInPile) {
+        ((UIButton*)sender).frame = [self getSmallFrame:((UIButton*)sender).frame];
+    } else {
+        ((UIButton*)sender).frame = [self getLargeFrame:((UIButton*)sender).frame];
+    }
+}
+
+-(CGRect) getSmallFrame:(CGRect)curFrame {
+    return CGRectMake(curFrame.origin.x, curFrame.origin.y,smallFrame.size.width, smallFrame.size.height);
+}
+
+
+-(CGRect) getLargeFrame:(CGRect)curFrame {
+    return CGRectMake(curFrame.origin.x, curFrame.origin.y,largeFrame.size.width, largeFrame.size.height);
+}
+
+@end
