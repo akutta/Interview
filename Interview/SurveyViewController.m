@@ -29,7 +29,7 @@
 -(IBAction)beginStudy:(id)sender
 {   
     NSMutableArray *questionBank = [[NSMutableArray alloc] initWithCapacity:7];
-    if ( [self delegate].userAge < 18 ) {
+    //if ( [self delegate].userAge < 18 ) {
         [questionBank addObject:[NSNumber numberWithInt:1]];
         [questionBank addObject:[NSNumber numberWithInt:2]];
         [questionBank addObject:[NSNumber numberWithInt:3]];
@@ -81,7 +81,7 @@
 //                [questionBank addObject:[NSNumber numberWithInt:9]];
 //            }
 //        }
-    }
+    //}
     
     NSLog(@"IsSmoker:  %@",([self delegate].isSmoker ? @"YES" : @"NO"));   
     NSArray *paths = NSSearchPathForDirectoriesInDomains
