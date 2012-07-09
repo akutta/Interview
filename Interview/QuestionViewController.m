@@ -107,7 +107,11 @@
     [pileLabel1 setNumberOfLines:2];
     [pileLabel2 setNumberOfLines:2];
     [pileLabel3 setNumberOfLines:2];
-    
+
+    //
+    // Add a lot of borders to create grid
+    //
+
     [self addBorder:mainTitle width:3.0f radius:0.0f];
     [self addBorder:pile1 width:3.0f radius:0.0f];   
     [self addBorder:pile2 width:3.0f radius:0.0f];
@@ -161,6 +165,9 @@
     
     numPiles = 2;
     
+    //
+    // Define the look based on which question we are currently on
+    //
     switch (question) {
         case 1:
             backButton.hidden = true;
@@ -246,6 +253,11 @@
     [[self delegate] switchView:self.view toView:nextView.view newController:nextView]; 
 }
 
+//
+//  Logs the results of each question to a file
+//      This file is located in the Application/Documents/<user_id>/ folder
+//      NOTE:  <user_id> is user specified at the beginning of the run
+//
 -(BOOL)processFeedback {
     
     
@@ -330,13 +342,6 @@
 {
     [self processFeedback];
     
-    /*
-    ViewController *nextView = [[ViewController alloc] initWithNibName:@"ViewController" bundle:nil];
-    [[self delegate] switchView:self.view toView:nextView.view newController:nextView];
-    UIAlertView *balaji = [[UIAlertView alloc] initWithTitle:@"Alert" message:@"You have completed the survey. Thank you for participating." delegate:nil cancelButtonTitle:@"Cancel" otherButtonTitles:@"DONE", nil];
-    [balaji show];
-    */
-    
     CompletedViewController *nextView = [[CompletedViewController alloc] initWithNibName:@"CompletedViewController" bundle:nil];
     [[self delegate] switchView:self.view toView:nextView.view newController:nextView];
     
@@ -372,7 +377,6 @@
     }
 }
 
-
 -(BOOL)highlight:(UILabel*)pile objectPoint:(CGPoint)point highlightColor:(UIColor*)color {
     if ( [self withinPile:pile.frame objectPoint:point] == TRUE ) {
         pile.backgroundColor = color;
@@ -388,6 +392,9 @@
                         frame.origin.y + frame.size.height/2);
 }
 
+//
+//  Ugly bounds checking
+//
 -(CGPoint)checkHighlight:(CGPoint)point {
     CGPoint retValue = CGPointZero;
     if ( [self highlight:pile1_1x1 objectPoint:point highlightColor:[UIColor blueColor]] ) {
@@ -480,12 +487,21 @@
 
 
 - (IBAction)imageReleased:(id)sender withEvent:(UIEvent*) event{
-    
+    //
+    //  Added Special case in Interview.
+    //      Button does not move, so the image will remain stationary. 
+    //      Skip a lot of unecessary stuff below and just say, on next cycle, call doHighlight.
+    //
     if ( question < 3 ) {
         [self performSelector:@selector(doHighlight:) withObject:sender afterDelay:0];
         return;
     }
     
+    //
+    // Ensure image is in front
+    //  Figure out which pile the image was dropped into and then add / remove from arrays that
+    //      keep track of what is in each pile.
+    // 
     [self.view bringSubviewToFront:(UIView*)sender];
     CGPoint point = [[[event allTouches] anyObject] locationInView:self.view];
     UIControl *control = sender;
@@ -525,6 +541,9 @@
     
     NSString* labelText = ((UIButton*)sender).titleLabel.text;
     
+    //
+    //  This is where we add/remove stuff from piles
+    //
     switch (pileNumber) {
         case 0:
             [self removeFromPile:imagesOnPile1 string:labelText];
@@ -548,7 +567,10 @@
             break;
     }
     
+    //
     // Ugly ignore this too
+    //      Basically does a lot of ui crap
+    //
     CGPoint retVal = [self checkHighlight:point];
     [self checkHighlight:(CGPointZero)];
     if ( retVal.x != CGPointZero.x && retVal.y != CGPointZero.y ) {
@@ -575,36 +597,19 @@
 {
     
     // Special Case of only Selecting an Image
+    //
+    //      In LabelStudy this contains a lot of code to just goto the next question
+    //      In Interview we return here and have it continue highlighting when the user releases the image
+    //
     if ( question < 3 ) {
-        
-//        NSArray *paths = NSSearchPathForDirectoriesInDomains
-//        (NSDocumentDirectory, NSUserDomainMask, YES);
-//        NSString *documentsDirectory = [paths objectAtIndex:0];
-//        
-//        NSString *fileName = [[NSString alloc] initWithFormat:@"%@_%i.txt", [self delegate].userId,question];
-//        //NSString *selectedLabel = [[NSString alloc] initWithFormat:@"%@",questionLabel.text];
-//        //selectedLabel = [selectedLabel stringByAppendingFormat:@"\n\t%@",((UIButton*)sender).titleLabel.text];
-//        NSString* selectedLabel = ((UIButton*)sender).titleLabel.text;
-//        
-//        [selectedLabel writeToFile:[[NSString alloc] initWithFormat:@"%@/%@/%@",documentsDirectory,[self delegate].userId, fileName] 
-//                 atomically:YES 
-//                   encoding:NSStringEncodingConversionAllowLossy 
-//                      error:nil];
-//
-//        
-//        [selectedLabel writeToFile:[[NSString alloc] initWithFormat:@"%@/%@/%@",documentsDirectory,[self delegate].userId, fileName] 
-//                 atomically:YES 
-//                   encoding:NSStringEncodingConversionAllowLossy 
-//                      error:nil];
-//        
-//        NSLog(@"Filename:  %@\n%@",fileName,selectedLabel);
-//        
-//        QuestionViewController *nextView = [[QuestionViewController alloc] initWithNibName:@"QuestionViewController" bundle:nil 
-//                                                                                 questions:questionBank questionsToAsk:remainingQuestions];
-//        [[self delegate] switchView:self.view toView:nextView.view newController:nextView]; 
         return;
     }
     
+    //
+    //  Bring selected image to the front
+    //  Detect if it is hovering over a pile or not.
+    //      If it is then shrink the size and highlight.  otherwise bring back to original size.
+    //
     [self.view bringSubviewToFront:(UIView*)sender];
     CGPoint point = [[[event allTouches] anyObject] locationInView:self.view];
     UIControl *control = sender;
